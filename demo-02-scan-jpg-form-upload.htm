@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>scanner.js demo: Scan as JPEG and display on the web page</title>
+    <title>scanner.js demo: Scan JPEG to Form</title>
     <meta charset='utf-8'>
     <script src="//asprise.com/scan/scannerjs/demo/inc/scanner.js"  type="text/javascript"></script>
 
@@ -59,6 +59,23 @@
             document.getElementById('images').appendChild(elementImg);
         }
 
+        <!-- Previous lines are same as demo-01, below is new addition to demo-02 -->
+
+        /** Upload scanned images by submitting the form */
+        function submitFormWithScannedImages() {
+            if (asprise_scanner_js_submit_form_with_images('form1', imagesScanned, function (xhr) {
+                if (xhr.readyState == 4) { // 4: request finished and response is ready
+                    document.getElementById('server_response').innerHTML = "<h2>Response from the server: </h2>" + xhr.responseText;
+                    document.getElementById('images').innerHTML = ''; // clear images
+                    imagesScanned = [];
+                }
+            })) {
+                document.getElementById('server_response').innerHTML = "Submitting, please stand by ...";
+            } else {
+                document.getElementById('server_response').innerHTML = "Form submission cancelled.";
+            }
+        }
+
     </script>
 
     <style>
@@ -74,11 +91,20 @@
 </head>
 <body>
 
-    <h2>Scan as JPG and display on the web page</h2>
+    <h2>Scan JPG to Form and then Submit</h2>
 
     <button type="button" onclick="scanToJpg();">Scan</button>
 
     <div id="images"></div>
+
+    <!-- Previous lines are same as demo-01, below is new addition to demo-02 -->
+
+    <form id="form1" action="https://asprise.com/scan/applet/upload.php?action=dump" method="POST" enctype="multipart/form-data" target="_blank" >
+        <input type="text" id="sample-field" name="sample-field" value="Test scan"/>
+        <input type="button" value="Submit" onclick="submitFormWithScannedImages();">
+    </form>
+
+    <div id="server_response"></div>
 
 </body>
 </html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>scanner.js demo: Scan to Local Disk</title>
+    <meta charset='utf-8'>
+    <script src="//asprise.com/scan/scannerjs/demo/inc/scanner.js"  type="text/javascript"></script>
+
+    <script>
+        //
+        // Please read scanner.js developer's guide at: http://asprise.com/document-scan-upload-image-browser/ie-chrome-firefox-scanner-docs.html
+        //
+
+        /** Initiates a scan */
+        function scanToLocalDisk() {
+            asprise_scanner_js_scan(displayResponseOnPage,
+                {
+                    "output_settings": [
+                        {
+                            "type": "save",
+                            "format": "pdf",
+                            "save_path": "${TMP}\\${TMS}${EXT}"
+                        }
+                    ]
+                }
+            );
+        }
+
+        function displayResponseOnPage(successful, mesg, response) {
+            if(!successful) { // On error
+                document.getElementById('response').innerHTML = 'Failed: ' + mesg;
+                return;
+            }
+
+            if(successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User cancelled.
+                document.getElementById('response').innerHTML = 'User cancelled';
+                return;
+            }
+
+            document.getElementById('response').innerHTML = getSaveResponse(response);
+        }
+    </script>
+
+    <style>
+        img.scanned {
+            height: 200px; /** Sets the display size */
+            margin-right: 12px;
+        }
+
+        div#images {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Scan to Local Disk</h2>
+
+    <button type="button" onclick="scanToLocalDisk();">Scan</button>
+
+    <div id="response"></div>
+
+</body>
+</html>
