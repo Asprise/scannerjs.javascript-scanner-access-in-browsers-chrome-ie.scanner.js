@@ -3,7 +3,7 @@
 <head>
     <title>scanner.js demo: Scan as JPEG and display on the web page</title>
     <meta charset='utf-8'>
-    <script src="//asprise.com/scan/scannerjs/demo/inc/scanner.js"  type="text/javascript"></script>
+    <script src="//cdn.asprise.com/scannerjs/scanner.js" type="text/javascript"></script>
 
     <script>
         //
@@ -12,7 +12,7 @@
 
         /** Initiates a scan */
         function scanToJpg() {
-            asprise_scanner_js_scan(displayImagesOnPage,
+            scanner.scan(displayImagesOnPage,
                     {
                         "output_settings": [
                             {
@@ -36,7 +36,7 @@
                 return;
             }
 
-            var scannedImages = getScannedImages(response, true, false); // returns an array of ScannedImage
+            var scannedImages = scanner.getScannedImages(response, true, false); // returns an array of ScannedImage
             for(var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
                 var scannedImage = scannedImages[i];
                 processScannedImage(scannedImage);
@@ -49,7 +49,7 @@
         /** Processes a ScannedImage */
         function processScannedImage(scannedImage) {
             imagesScanned.push(scannedImage);
-            var elementImg = createDomElementFromModel( {
+            var elementImg = scanner.createDomElementFromModel( {
                 'name': 'img',
                 'attributes': {
                     'class': 'scanned',

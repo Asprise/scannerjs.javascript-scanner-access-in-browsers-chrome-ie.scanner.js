@@ -3,7 +3,7 @@
 <head>
     <title>scanner.js demo: Scan to Local Disk</title>
     <meta charset='utf-8'>
-    <script src="//asprise.com/scan/scannerjs/demo/inc/scanner.js"  type="text/javascript"></script>
+    <script src="//cdn.asprise.com/scannerjs/scanner.js" type="text/javascript"></script>
 
     <script>
         //
@@ -12,7 +12,7 @@
 
         /** Initiates a scan */
         function scanToLocalDisk() {
-            asprise_scanner_js_scan(displayResponseOnPage,
+            scanner.scan(displayResponseOnPage,
                 {
                     "output_settings": [
                         {
@@ -36,7 +36,7 @@
                 return;
             }
 
-            document.getElementById('response').innerHTML = getSaveResponse(response);
+            document.getElementById('response').innerHTML = scanner.getSaveResponse(response);
         }
     </script>
 

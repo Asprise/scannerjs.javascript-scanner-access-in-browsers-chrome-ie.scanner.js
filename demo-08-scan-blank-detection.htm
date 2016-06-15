@@ -3,7 +3,7 @@
 <head>
     <title>scanner.js demo: Scan with blank page detection</title>
     <meta charset='utf-8'>
-    <script src="//asprise.com/scan/scannerjs/demo/inc/scanner.js"  type="text/javascript"></script>
+    <script src="//cdn.asprise.com/scannerjs/scanner.js" type="text/javascript"></script>
 
     <script>
         //
@@ -12,7 +12,7 @@
 
         /** Scan and upload in one go */
         function scanAndUploadDirectly() {
-            asprise_scanner_js_scan(displayServerResponse,
+            scanner.scan(displayServerResponse,
                 {
                     "output_settings": [
                         {
@@ -40,7 +40,7 @@
                 return;
             }
 
-            document.getElementById('server_response').innerHTML = getUploadResponse(response);
+            document.getElementById('server_response').innerHTML = scanner.getUploadResponse(response);
         }
     </script>
 
