@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scanner.js Tip: Scan Using "default" Source With "select" as Fallback</title>
+    <meta charset='utf-8'>
+    <script src="//asprise.azureedge.net/scannerjs/scanner.js" type="text/javascript"></script>
+
+    <script>
+        // Please read scanner.js developer's guide at: http://asprise.com/document-scan-upload-image-browser/ie-chrome-firefox-scanner-docs.html
+
+        var scanRequest = {
+            "source_name" : "select", // Device selection: "select" (prompts device selection dialog), "default" (uses the current default device) or the exact device name.
+
+            "use_asprise_dialog": false, // Whether to use Asprise Scanning Dialog
+            "show_scanner_ui": false, // Whether scanner UI should be shown
+
+            "twain_cap_setting" : { // Optional scanning settings
+                "ICAP_PIXELTYPE" : "TWPT_RGB", // Color
+                "ICAP_SUPPORTEDSIZES" : "TWSS_USLETTER" // Paper size: TWSS_USLETTER, TWSS_A4, ...
+            },
+
+            "output_settings": [
+                {
+                    "type": "return-base64",
+                    "format": "jpg"
+                }
+            ]
+        };
+
+        /** Sets the source_name in request and triggers the scan */
+        function scan(sourceName) {
+            sourceName = typeof sourceName !== 'undefined' ? sourceName : 'default'; // Use 'default' if sourceName is not specified.
+
+            scanRequest.source_name = sourceName;
+            log("Attempts to scan with source = " + scanRequest.source_name + " ...");
+            scanner.scan(handleScanResult, scanRequest);
+        }
+
+        /** Checks response before parsing and performs fallback scanning if possible. */
+        function handleScanResult(successful, mesg, response) {
+            var errorMesg = successful ? undefined : mesg;
+
+            if(successful && response != null) {
+                var responseAsJson = JSON.parse(response);
+                if(responseAsJson != null && responseAsJson.image_count == 0 && responseAsJson.last_transfer_rc == "TWRC_FAILURE") {
+                    errorMesg = "Device failure";
+                } else {
+                    try {
+                        displayImagesOnPage(successful, mesg, response);
+                    } catch (exp) {
+                        errorMesg = exp;
+                    }
+                }
+            }
+
+            // feel free to check response and add other failure criteria ...
+
+            if(errorMesg) {
+                log("Error occurred when scanning with source = " + scanRequest.source_name + ": " + errorMesg, true);
+                if (scanRequest.source_name == 'default') { // fall back to select
+                    log("Failed to scan with source = " + scanRequest.source_name + "; attempt source = 'select' ...");
+                    scan('select');
+                } else { // report final error here ...
+                    log("Fatal error: Failed to scan (tried both default and select)", true);
+                }
+            } else {
+                log("Scan succeeds with source = " + scanRequest.source_name);
+            }
+        }
+
+        function log(mesg, isError) {
+            var line = (new Date().toLocaleTimeString()) + " " + (isError ? "ERROR " : " INFO ") + mesg;
+            var textArea = document.getElementById("textarea_logging");
+            if(textArea) {
+                textArea.value = textArea.value + '\r' + line;
+            } else {
+                alert(line);
+            }
+        }
+
+        // --------------- below functions are identical with many other demo scripts ---------------
+        /** Processes the scan result */
+        function displayImagesOnPage(successful, mesg, response) {
+            if(!successful) { // On error
+                console.error('Failed: ' + mesg);
+                return;
+            }
+
+            if(successful && mesg != null && mesg.toLowerCase().indexOf('user cancel') >= 0) { // User cancelled.
+                console.info('User cancelled');
+                return;
+            }
+
+            var scannedImages = scanner.getScannedImages(response, true, false); // returns an array of ScannedImage
+            for(var i = 0; (scannedImages instanceof Array) && i < scannedImages.length; i++) {
+                var scannedImage = scannedImages[i];
+                processScannedImage(scannedImage);
+            }
+        }
+
+        /** Images scanned so far. */
+        var imagesScanned = [];
+
+        /** Processes a ScannedImage */
+        function processScannedImage(scannedImage) {
+            imagesScanned.push(scannedImage);
+            var elementImg = scanner.createDomElementFromModel( {
+                'name': 'img',
+                'attributes': {
+                    'class': 'scanned',
+                    'src': scannedImage.src
+                }
+            });
+            document.getElementById('images').appendChild(elementImg);
+        }
+
+    </script>
+
+    <style>
+        img.scanned {
+            height: 200px; /** Sets the display size */
+            margin-right: 12px;
+        }
+
+        div#images {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Scan Using "default" Source With "select" as Fallback</h2>
+
+    <button type="button" onclick="scan('default');">Scan using 'default' with 'select' as fallback</button>
+
+    <button type="button" onclick="scan('select');">Scan using 'select' only</button>
+
+    <div id="images"></div>
+
+    <textarea id="textarea_logging" style="width: 100%; height: 400px;">--- Logging ---</textarea>
+
+</body>
+</html>
