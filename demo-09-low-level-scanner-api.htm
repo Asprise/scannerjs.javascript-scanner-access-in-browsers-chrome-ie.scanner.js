@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>scanner.js demo: low level scanner access API</title>
+    <meta charset='utf-8'>
+    <script src="http://asprise.azureedge.net/scannerjs/scanner.js" type="text/javascript"></script>
+
+    <script>
+        //
+        // Please read scanner.js developer's guide at: http://asprise.com/document-scan-upload-image-browser/ie-chrome-firefox-scanner-docs.html
+        //
+        function listSources() {
+            displayText("Listing sources ...");
+            scanner.listSources(callbackFunc, false, "all", true, true);
+        }
+
+        function selectSource() {
+            displayText("Select a source ...");
+            scanner.getSource(callbackFunc, "select", true);
+        }
+
+        function getSourceCaps() {
+            displayText("Gets source capabilities ...");
+            scanner.getSource(callbackFunc, "select", false, "all", false, true, "CAP_FEEDERENABLED: false; ICAP_UNITS: TWUN_INCHES");
+        }
+
+        function callbackFunc(successful, mesg, result) {
+            displayText((successful ? "OK" : "ERROR") + (mesg ? " - " + mesg : "") + "\n" + result);
+        }
+
+        function displayText(s) {
+            document.getElementById('output').textContent = s;
+        }
+    </script>
+
+    <style>
+    </style>
+</head>
+<body>
+
+    <h2>Low level scanner access: list sources, select a source, get source capabilities</h2>
+
+    <input type="button" Value="List Sources" onclick="listSources();" />
+    <input type="button" Value="Select source" onclick="selectSource();" />
+    <input type="button" Value="Get source caps" onclick="getSourceCaps();" />
+
+
+    <pre id="output"></pre>
+
+
+</body>
+</html>
